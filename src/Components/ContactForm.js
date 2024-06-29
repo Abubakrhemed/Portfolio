@@ -1,33 +1,42 @@
-import React, { useRef } from 'react';
-import emailjs from 'emailjs-com';
+import React from 'react';
 import './FormStyles.css';
 
 const ContactForm = () => {
-  const form = useRef();
+  const [result, setResult] = React.useState("");
 
-  const sendEmail = (e) => {
-    e.preventDefault();
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    setResult("Sending...");
+    const formData = new FormData(event.target);
 
-    emailjs.sendForm('service_4laxu12', 'template_t0m5gw5', form.current, '7Qy_GJsBkWVFEaL-0')
-      .then((result) => {
-        console.log(result.text);
-        alert('Email sent successfully!');
-      }, (error) => {
-        console.log(error.text);
-        alert('Failed to send email.');
-      });
+    formData.append("access_key", "530278a5-61b4-401b-9e77-8d21a95a3a59");
 
-    e.target.reset();
+    const response = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      setResult("Form Submitted Successfully");
+      alert("Email sent successfully!");
+      event.target.reset();
+    } else {
+      console.log("Error", data);
+      setResult(data.message);
+      alert("Email failed to send. Please try again later.");
+    }
   };
 
   return (
     <div className="form">
-      <form ref={form} onSubmit={sendEmail}>
+      <form onSubmit={onSubmit}>
         <label>Your Name</label>
-        <input type="text" name="from_name" required />
+        <input type="text" name="name" required />
 
         <label>Your Email</label>
-        <input type="email" name="from_email" required />
+        <input type="email" name="email" required />
 
         <label>Subject</label>
         <input type="text" name="subject" required />
@@ -37,6 +46,7 @@ const ContactForm = () => {
 
         <button type="submit" className="btn">Submit</button>
       </form>
+      {result && <p>{result}</p>}
     </div>
   );
 };
