@@ -24,10 +24,10 @@ const ContactForm = () => {
     <div className="form">
       <form ref={form} onSubmit={sendEmail}>
         <label>Your Name</label>
-        <input type="text" name="name" required />
+        <input type="text" name="from_name" required />
 
         <label>Your Email</label>
-        <input type="email" name="email" required />
+        <input type="email" name="from_email" required />
 
         <label>Subject</label>
         <input type="text" name="subject" required />
