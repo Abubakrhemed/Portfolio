@@ -1,42 +1,36 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
+import emailjs from 'emailjs-com';
 import './FormStyles.css';
 
 const ContactForm = () => {
-  const [result, setResult] = React.useState("");
+  const form = useRef();
+  const [result, setResult] = useState('');
 
-  const onSubmit = async (event) => {
-    event.preventDefault();
-    setResult("Sending...");
-    const formData = new FormData(event.target);
+  const sendEmail = (e) => {
+    e.preventDefault();
+    setResult('Sending...');
 
-    formData.append("access_key", "530278a5-61b4-401b-9e77-8d21a95a3a59");
-
-    const response = await fetch("https://api.web3forms.com/submit", {
-      method: "POST",
-      body: formData
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      setResult("Form Submitted Successfully");
-      alert("Email sent successfully!");
-      event.target.reset();
-    } else {
-      console.log("Error", data);
-      setResult(data.message);
-      alert("Email failed to send. Please try again later.");
-    }
+    emailjs.sendForm('service_4laxu12', 'template_t0m5gw5', form.current, '7Qy_GJsBkWVFEaL-0')
+      .then((result) => {
+        console.log(result.text);
+        alert('Email sent successfully!');
+        setResult('Form Submitted Successfully');
+        e.target.reset();
+      }, (error) => {
+        console.log(error.text);
+        alert('Failed to send email. Please try again later.');
+        setResult('Failed to send email. Please try again later.');
+      });
   };
 
   return (
     <div className="form">
-      <form onSubmit={onSubmit}>
+      <form ref={form} onSubmit={sendEmail}>
         <label>Your Name</label>
-        <input type="text" name="name" required />
+        <input type="text" name="from_name" required />
 
         <label>Your Email</label>
-        <input type="email" name="email" required />
+        <input type="email" name="from_email" required />
 
         <label>Subject</label>
         <input type="text" name="subject" required />
